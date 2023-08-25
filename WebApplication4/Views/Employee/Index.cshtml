@@ -1,0 +1,198 @@
+﻿@model WebApplication4.Models.Employee
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+<script>
+    $(function () {
+        var maxDate = new Date();
+        maxDate.setFullYear(maxDate.getFullYear() - 18);
+
+        $('#dobPicker').datepicker({
+            format: 'yyyy-mm-dd',
+            startDate: '-100y', // Allow 100 years in the past
+            endDate: '0d',      // Disallow future dates
+            maxDate: maxDate,    // Restrict to 18 years ago from today
+            maxViewMode: 2,
+            todayHighlight: true,
+            autoclose: true
+        }).on('change', function () {
+            calculateAge();
+        });
+
+        calculateAge(); // Calculate age on page load
+    });
+
+    function calculateAge() {
+        var dob = new Date($('#dobPicker').val());
+        var today = new Date();
+        var age = today.getFullYear() - dob.getFullYear();
+
+        if (today.getMonth() < dob.getMonth() || (today.getMonth() === dob.getMonth() && today.getDate() < dob.getDate())) {
+            age--;
+        }
+
+        $('#ageField').val(age);
+    }
+        $(function () {
+            // Add education entry
+            $('#add-entry').click(function () {
+                var newEntry = $('.education-entry:last').clone();
+                newEntry.find('input').val(''); // Clear input values
+                newEntry.find('.remove-entry').show(); // Show remove button
+                $('#education-grid').append(newEntry);
+            });
+
+        // Remove education entry
+        $(document).on('click', '.remove-entry', function () {
+            $(this).closest('.education-entry').remove();
+        });
+    });
+</script>
+
+
+
+
+<style>
+    .centered-box {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .content-box {
+        width: 50%;
+        padding: 20px;
+        border: 1px solid #ccc;
+        background-color: #f5f5f5;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-group {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .form-label {
+        flex: 1;
+        text-align: right;
+        margin-right: 10px;
+    }
+
+    .form-input {
+        flex: 2;
+    }
+
+    .text-danger {
+        color: red;
+        margin-left: 100px;
+    }
+</style>
+<div class="centered-box">
+    <div class="content-box">
+        <h2>Create Employee</h2>
+
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            <div class="form-group">
+                <span class="form-label">
+                    @Html.LabelFor(model => model.ProfileImage)
+                </span>
+                <span class="form-input">
+                    <input type="file" name="PhotoFile" id="photoFile" accept=".png, .jpg, .jpeg" />
+                </span>
+                @Html.ValidationMessageFor(model => model.ProfileImage, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                <span class="form-label">@Html.LabelFor(model => model.FirstName)</span>
+                <span class="form-input"> @Html.TextBoxFor(model => model.FirstName, new { @class = "form-control" })</span>
+
+            </div>
+            @Html.ValidationMessageFor(model => model.FirstName, "", new { @class = "text-danger" })
+            <div class="form-group">
+                <span class="form-label">@Html.LabelFor(model => model.MiddleName)</span>
+                <span class="form-input"> @Html.TextBoxFor(model => model.MiddleName, new { @class = "form-control" })</span>
+
+            </div>
+            @Html.ValidationMessageFor(model => model.MiddleName, "", new { @class = "text-danger" })
+
+            <div class="form-group">
+                <span class="form-label"> @Html.LabelFor(model => model.LastName)</span>
+                <span class="form-input">
+                    @Html.TextBoxFor(model => model.LastName, new { @class = "form-control" })
+                </span>
+
+            </div>
+            @Html.ValidationMessageFor(model => model.LastName, "", new { @class = "text-danger" })
+            <div class="form-group">
+                <span class="form-label">
+                    @Html.LabelFor(model => model.DateOfBirth)
+                </span>
+                <span class="form-input">
+                    @Html.TextBoxFor(model => model.DateOfBirth, "{0:yyyy-MM-dd}", new { @class = "form-control", id = "dobPicker", max = DateTime.Now.ToString("yyyy-MM-dd") })
+                </span>
+
+            </div>
+            @Html.ValidationMessageFor(model => model.DateOfBirth, "", new { @class = "text-danger" })
+            <div class="form-group">
+                <span class="form-label">
+                    @Html.LabelFor(model => model.Age)
+                </span>
+                <span class="form-input">
+                    @Html.TextBoxFor(model => model.Age, new { @class = "form-control", @readonly = "readonly", id = "ageField" })
+                </span>
+            </div>
+
+
+            <div class="form-group">
+                <span class="form-label">
+                    @Html.LabelFor(model => model.Gender)
+                </span>
+                <span class="form-input">  @Html.EnumDropDownListFor(model => model.Gender, new { @class = "form-control" })</span>
+            </div>
+
+            <div class="form-group">
+                <span class="form-label">
+                    @Html.LabelFor(model => model.ContactNumber)
+                </span>
+                <span class="form-input">
+                    @Html.TextBoxFor(model => model.ContactNumber, new { @class = "form-control" })
+                </span>
+
+            </div>
+            @Html.ValidationMessageFor(model => model.ContactNumber, "", new { @class = "text-danger" })
+            <div class="form-group">
+                <span class="form-label">
+                    @Html.LabelFor(model => model.Email)
+                </span>
+                <span class="form-input">
+                    @Html.TextBoxFor(model => model.Email, new { @class = "form-control" })
+                </span>
+
+            </div>
+            @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+    <div class="form-group">
+        @Html.LabelFor(model => model.EducationDetails)
+        <div id="education-grid">
+            <div class="education-entry">
+                <input type="text" name="Degrees[]" placeholder="Degree" class="form-control" />
+                <input type="number" name="PassingYears[]" placeholder="Passing Year" class="form-control" />
+                <input type="number" name="Percentages[]" placeholder="Percentage" class="form-control" />
+                <button type="button" class="remove-entry">Remove</button>
+            </div>
+        </div>
+        <button type="button" id="add-entry">Add Education</button>
+    </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        }
+    </div>
+</div>
+
